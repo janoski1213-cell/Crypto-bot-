@@ -7,23 +7,23 @@ CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 try:
     URL = "https://min-api.cryptocompare.com/data/v2/news/?lang=ES"
     r = requests.get(URL, timeout=15).json()
+    news = r.get("Data", [])
 
-    if r['Data']:
-        noticia = r['Data'][0]
-        titulo = noticia['title']
-        enlace = noticia['url']
-        cuerpo = noticia['body'][:400]
-        mensaje = f"🚀 *NOTICIA CRIPTO* 🚀\n\n{titulo}\n\n{cuerpo}...\n\n{enlace}"
+    if news:
+        n = news[0]
+        title = n.get("title", "Noticia Cripto")
+        url = n.get("url", "")
+        body = n.get("body", "")[:400]
+        text = f"NOTICIA CRIPTO\n\n{title}\n\n{body}...\n\n{url}"
     else:
-        mensaje = "🚀 Bitcoin se mantiene activo. Revisa el mercado."
+        text = "Bitcoin se mantiene activo. Revisa el mercado."
 
-    requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage", json={
-        "chat_id": CHAT_ID,
-        "text": mensaje,
-        "parse_mode": "Markdown"
-    }, timeout=15)
-
+    requests.post(
+        f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+        json={"chat_id": CHAT_ID, "text": text, "parse_mode": "Markdown"},
+        timeout=15
+    )
     print("Enviado en español")
 
 except Exception as e:
-    print(f"Error:{e}")
+    print(f"Error: {e}")
